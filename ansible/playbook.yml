@@ -1,0 +1,24 @@
+- hosts: swarm_manager
+  become: true
+  tasks:
+    - name: Install Docker
+      shell: |
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sh get-docker.sh
+
+    - name: Initialize Swarm
+      shell: docker swarm init
+
+    - name: Create deploy directory
+      file:
+        path: /opt/yii2
+        state: directory
+
+    - name: Copy docker files
+      copy:
+        src: ../docker/
+        dest: /opt/yii2/
+
+    - name: Deploy stack
+      shell: docker stack deploy -c /opt/yii2/docker-compose.yml yii2stack
+
